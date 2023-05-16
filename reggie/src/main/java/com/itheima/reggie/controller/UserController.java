@@ -9,6 +9,7 @@ import com.itheima.reggie.utils.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     // 发送邮箱验证码
     @PostMapping("/sendMsg")
@@ -43,9 +47,10 @@ public class UserController {
     @PostMapping("/login")
     public R<User> login(@RequestBody Map<String, String> map, HttpSession session) {
         User user = userService.login(map, session);
+
+
         return R.success(user);
     }
-
-
-
 }
+
+

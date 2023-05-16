@@ -11,6 +11,7 @@ import com.itheima.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +46,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper,Dish> implements Dis
 
         //保存菜品口味数据到菜品口味表dish_flavor
         dishFlavorService.saveBatch(flavors);
+
 
     }
 

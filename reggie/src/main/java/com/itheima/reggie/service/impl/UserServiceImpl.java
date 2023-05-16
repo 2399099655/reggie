@@ -7,14 +7,21 @@ import com.itheima.reggie.entity.User;
 import com.itheima.reggie.mapper.UserMapper;
 import com.itheima.reggie.service.UserService;
 import com.itheima.reggie.utils.MailUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements UserService{
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     // 发送邮箱验证码
     @Override
     public Boolean sendMsg(User user, HttpSession session) throws MessagingException {
@@ -27,7 +34,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
             // 2.2 发送验证码邮件
             MailUtils.sendMail(email, code);
             // 2.3 把获得的验证码存入session保存作用域，方便后面拿出来比对
-            session.setAttribute(email, code);
+            //session.setAttribute(email, code);
+
+            //把获得的验证码缓存到redis中   并设置有效的缓存时间为5min
+            redisTemplate.opsForValue().set(email,code,5, TimeUnit.MINUTES);
+
+
+
             // 启动多线程来限定验证码的时效性
             new Thread(() -> {
                 try {
@@ -59,7 +72,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
 
         // 如果邮箱和验证码不为空，前往调用数据层查询数据库有无该用户
         // 获取之前存在session保存作用域中的正确验证码
-        String trueCode = (String) session.getAttribute(email);
+        //String trueCode = (String) session.getAttribute(email);
+
+        //获取缓存在redis中的验证码
+        String trueCode= (String) redisTemplate.opsForValue().get(email);
 
         // 比对用户输入的验证码和真实验证码，错了直接登录失败
         if (!code.equals(trueCode)) {
@@ -80,6 +96,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
         }
         // 最后把这个登录用户存到session保存作用域中，表示已登录，让拦截器放行
         session.setAttribute("user", user.getId());
+
+
+       //登陆成功 删除验证码
+        redisTemplate.delete(email);
+
         return user;
     }
 
