@@ -1,6 +1,8 @@
 package com.itheima.reggie.common;
 
 import lombok.Data;
+
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +11,7 @@ import java.util.Map;
  * @param <T>
  */
 @Data
-public class R<T> {
+public class R<T> implements Serializable {
 
     private Integer code; //编码：1成功，0和其它数字为失败
 
@@ -19,7 +21,7 @@ public class R<T> {
 
     private Map map = new HashMap(); //动态数据
 
-    public static <T> R<T> success(T object) {
+    public static <T> R<T> success(T object)  {
         R<T> r = new R<T>();
         r.data = object;
         r.code = 1;
