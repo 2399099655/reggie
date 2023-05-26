@@ -1,15 +1,21 @@
 package com.itheima.reggie.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.itheima.reggie.common.CustomException;
 import com.itheima.reggie.dto.SetmealDto;
+import com.itheima.reggie.entity.Category;
+import com.itheima.reggie.entity.Dish;
 import com.itheima.reggie.entity.Setmeal;
 import com.itheima.reggie.entity.SetmealDish;
 import com.itheima.reggie.mapper.SetmealMapper;
+import com.itheima.reggie.service.CategoryService;
 import com.itheima.reggie.service.SetmealDishService;
 import com.itheima.reggie.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +29,11 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper,Setmeal> imple
 
     @Autowired
     private SetmealDishService setmealDishService;
+
+
+
+    @Autowired
+    private CategoryService categoryService;
 
     /**
      * 新增套餐，同时需要保存套餐和菜品的关联关系
@@ -42,6 +53,9 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper,Setmeal> imple
         //保存套餐和菜品的关联信息，操作setmeal_dish,执行insert操作
         setmealDishService.saveBatch(setmealDishes);
     }
+
+
+
 
     /**
      * 删除套餐，同时需要删除套餐和菜品的关联数据
@@ -69,5 +83,38 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper,Setmeal> imple
         lambdaQueryWrapper.in(SetmealDish::getSetmealId,ids);
         //删除关系表中的数据----setmeal_dish
         setmealDishService.remove(lambdaQueryWrapper);
+    }
+
+
+
+    //管理端套餐分页查询
+    @Override
+    public Page<Setmeal> page(int page, int pageSize, String name) {
+    Page<Setmeal> setmealPage =new Page<>(page,pageSize);
+    Page<SetmealDto> setmealDtoPage =new Page<>();
+
+    LambdaQueryWrapper<Setmeal> lambdaQueryWrapper =new LambdaQueryWrapper<>();
+    lambdaQueryWrapper.like(StringUtils.isNotEmpty(name),Setmeal::getName,name);
+    lambdaQueryWrapper.orderByDesc(Setmeal::getUpdateTime);
+    this.page(setmealPage,lambdaQueryWrapper);             //1、查出所有setmeal数据
+
+
+
+        BeanUtils.copyProperties(setmealPage,setmealDtoPage,"records");
+
+        List<Setmeal> records = setmealPage.getRecords();
+
+        List<SetmealDto> setmealDtoList = records.stream().map( item ->{
+            SetmealDto setmealDto =new SetmealDto();
+            BeanUtils.copyProperties(item,setmealDto);
+            Category category =categoryService.getById(item.getCategoryId());  //2、分类名字赋给dto
+            setmealDto.setCategoryName(category.getName());
+            return setmealDto;
+                }
+        ).collect(Collectors.toList());
+
+        setmealDtoPage.setRecords(setmealDtoList);
+
+        return setmealPage;
     }
 }

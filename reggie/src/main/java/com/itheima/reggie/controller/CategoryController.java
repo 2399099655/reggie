@@ -40,7 +40,7 @@ public class CategoryController {
      * @param pageSize
      * @return
      */
-    @GetMapping("/page")
+ /*   @GetMapping("/page")
     public R<Page> page(int page,int pageSize){
         //分页构造器
         Page<Category> pageInfo = new Page<>(page,pageSize);
@@ -52,7 +52,18 @@ public class CategoryController {
         //分页查询
         categoryService.page(pageInfo,queryWrapper);
         return R.success(pageInfo);
+    }*/
+    /**
+     * 分页查询
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @GetMapping("/page")
+    public R<Page> page(int page,int pageSize) {
+        return R.success(categoryService.page(page,pageSize));
     }
+
 
     /**
      * 根据id删除分类

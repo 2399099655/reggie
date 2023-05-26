@@ -1,6 +1,7 @@
 package com.itheima.reggie.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.itheima.reggie.common.CustomException;
 import com.itheima.reggie.entity.Category;
@@ -51,5 +52,23 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper,Category> im
 
         //正常删除分类
         super.removeById(id);
+    }
+
+
+
+    /*分类的分页查询*/
+    @Override
+    public Page page(int page, int pageSize) {
+        //分页构造器
+        Page<Category> pageInfo = new Page<>(page, pageSize);
+        //条件构造器
+        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
+        //添加排序条件，根据sort进行排序
+        queryWrapper.orderByAsc(Category::getSort);
+
+        //分页查询
+        page(pageInfo, queryWrapper);
+
+        return  pageInfo;
     }
 }

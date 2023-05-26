@@ -1,5 +1,6 @@
 package com.itheima.reggie.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.itheima.reggie.dto.SetmealDto;
 import com.itheima.reggie.entity.Setmeal;
@@ -18,4 +19,8 @@ public interface SetmealService extends IService<Setmeal> {
      * @param ids
      */
     public void removeWithDish(List<Long> ids);
+
+
+    //管理端套餐分页查询
+    public Page<Setmeal> page(int page, int pageSize, String name);
 }

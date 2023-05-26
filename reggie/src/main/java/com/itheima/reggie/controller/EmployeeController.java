@@ -105,7 +105,7 @@ public class EmployeeController {
      * @param name
      * @return
      */
-    @GetMapping("/page")
+  /*  @GetMapping("/page")
     public R<Page> page(int page,int pageSize,String name){
         log.info("page = {},pageSize = {},name = {}" ,page,pageSize,name);
 
@@ -123,7 +123,28 @@ public class EmployeeController {
         employeeService.page(pageInfo,queryWrapper);
 
         return R.success(pageInfo);
+    }*/
+    /**
+     * 员工信息分页查询
+     * @param page
+     * @param pageSize
+     * @param name
+     * @return
+     */
+
+    @GetMapping("/page")
+    public  R<Page>  page(int page,int pageSize,String name)
+    {
+        return  R.success(employeeService.page(page,pageSize,name));
+
     }
+
+
+
+
+
+
+
 
     /**
      * 根据id修改员工信息

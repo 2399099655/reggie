@@ -40,6 +40,8 @@ public class DishController {
     @Autowired
     private RedisTemplate redisTemplate;
 
+
+
     /**
      * 新增菜品
      * @param dishDto
@@ -56,13 +58,14 @@ public class DishController {
         return R.success("新增菜品成功");
     }
 
+
     /**
      * 菜品信息分页查询
      * @param page
      * @param pageSize
      * @param name
      * @return
-     */
+     *//*
     @GetMapping("/page")
     public R<Page> page(int page,int pageSize,String name){
 
@@ -82,8 +85,8 @@ public class DishController {
 
         //对象拷贝
         BeanUtils.copyProperties(pageInfo,dishDtoPage,"records");
-
         List<Dish> records = pageInfo.getRecords();
+
 
         List<DishDto> list = records.stream().map((item) -> {
             DishDto dishDto = new DishDto();
@@ -104,7 +107,21 @@ public class DishController {
         dishDtoPage.setRecords(list);
 
         return R.success(dishDtoPage);
+    }*/
+
+    /**
+     * 菜品信息分页查询
+     * @param page
+     * @param pageSize
+     * @param name
+     * @return
+     */
+    @GetMapping("/page")
+    public R<Page> page(int page,int pageSize,String name) {
+       return R.success(dishService.page(page,pageSize,name));
     }
+
+
 
     /**
      * 根据id查询菜品信息和对应的口味信息
@@ -138,11 +155,11 @@ public class DishController {
 
 
     /**
-     * 根据条件查询对应的菜品数据
+     * 客户端点击分类，查询对应的菜品数据
      * @param dish
      * @return
      */
-    @GetMapping("/list")
+ /*   @GetMapping("/list")
     public R<List<DishDto>> list(Dish dish) {
         List<DishDto> dishDtoList=null;
 
@@ -154,8 +171,6 @@ public class DishController {
         {
            return R.success(dishDtoList);
         }
-
-
         log.info("dish:{}", dish);
         //创建条件构造器
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
@@ -188,8 +203,26 @@ public class DishController {
 
 
         return R.success(dishDtoList);
+    }*/
+
+
+    /**客户端菜品展示
+     *
+     *
+     * @param dish
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<DishDto>> list(Dish dish){
+
+    return R.success(dishService.list(dish));
+
+    }
+
     }
 
 
 
-}
+
+
+

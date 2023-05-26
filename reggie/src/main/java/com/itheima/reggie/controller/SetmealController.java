@@ -60,13 +60,13 @@ public class SetmealController {
     }
 
     /**
-     * 套餐分页查询
+     * 客户端套餐分页查询
      * @param page
      * @param pageSize
      * @param name
      * @return
      */
-    @GetMapping("/page")
+    /*@GetMapping("/page")
     public R<Page> page(int page,int pageSize,String name){
         //分页构造器对象
         Page<Setmeal> pageInfo = new Page<>(page,pageSize);
@@ -102,6 +102,16 @@ public class SetmealController {
 
         dtoPage.setRecords(list);
         return R.success(dtoPage);
+    }*/
+
+
+
+//  管理端套餐分页查询
+
+    @GetMapping("/page")
+    public R<Page> page(int page,int pageSize, String name)
+    {
+  return R.success(setmealService.page(page,pageSize,name));
     }
 
     /**
@@ -130,6 +140,13 @@ public class SetmealController {
         queryWrapper.orderByDesc(Setmeal::getUpdateTime);
 
         return R.success(setmealService.list(queryWrapper));*/
+
+
+    /**
+     * 客户端展示套餐
+     * @param setmeal
+     * @return
+     */
 
     @GetMapping("/list")
     @Cacheable(value = "setmealCache" , key = "#setmeal.categoryId+ '_'+ #setmeal.status")

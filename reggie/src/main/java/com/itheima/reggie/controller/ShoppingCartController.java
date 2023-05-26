@@ -23,12 +23,13 @@ public class ShoppingCartController {
     @Autowired
     private ShoppingCartService shoppingCartService;
 
+
     /**
      * 添加购物车
      * @param shoppingCart
      * @return
      */
-    @PostMapping("/add")
+   /* @PostMapping("/add")
     public R<ShoppingCart> add(@RequestBody ShoppingCart shoppingCart){
         log.info("购物车数据:{}",shoppingCart);
 
@@ -69,12 +70,28 @@ public class ShoppingCartController {
 
         return R.success(cartServiceOne);
     }
+*/
+
+
+
+
+    //添加购物车
+    @PostMapping("/add")
+    public R<ShoppingCart> add(@RequestBody ShoppingCart shoppingCart) {
+    return R.success(shoppingCartService.addCart(shoppingCart));
+    }
+
+
+
+
+
+
 
     /**
      * 查看购物车
      * @return
      */
-    @GetMapping("/list")
+/*    @GetMapping("/list")
     public R<List<ShoppingCart>> list(){
         log.info("查看购物车...");
 
@@ -85,8 +102,16 @@ public class ShoppingCartController {
         List<ShoppingCart> list = shoppingCartService.list(queryWrapper);
 
         return R.success(list);
-    }
+    }*/
 
+
+    //查看购物车
+    @GetMapping("/list")
+     public  R<List<ShoppingCart>> list()
+    {
+      return R.success(shoppingCartService.list());
+
+    }
     /**
      * 清空购物车
      * @return
