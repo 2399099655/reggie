@@ -1,6 +1,7 @@
 package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.dto.SetmealDto;
@@ -161,4 +162,35 @@ public class SetmealController {
         return R.success(setmealService.list(queryWrapper));
 
     }
+
+
+    /**
+     * 管理端批量起售停售套餐
+     * @param status
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    public R<String> status(@PathVariable("status") Integer status, @RequestParam List<Long> ids)
+    {
+     log.info("status:{}",status);
+     log.info("ids:{}",ids);
+        LambdaUpdateWrapper<Setmeal> lambdaUpdateWrapper =new LambdaUpdateWrapper<>();
+        lambdaUpdateWrapper.set(Setmeal::getStatus,status).in(Setmeal::getId,ids);
+        setmealService.update(lambdaUpdateWrapper);
+        return R.success("修改套餐状态成功");
+    }
+
+
+
+
+    @GetMapping("/dish/{id}")
+    public R<List<SetmealDto>> showSetmealDish(@PathVariable("id") Long id)
+    {
+
+
+      return  R.success(setmealService.showSetmealDish(id));
+
+    }
+
 }

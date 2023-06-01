@@ -19,7 +19,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -112,9 +114,34 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper,Setmeal> imple
             return setmealDto;
                 }
         ).collect(Collectors.toList());
-
         setmealDtoPage.setRecords(setmealDtoList);
-
         return setmealPage;
+    }
+
+
+
+
+
+    @Override
+    public List<SetmealDto> showSetmealDish(Long id) {
+     LambdaQueryWrapper<Setmeal> lambdaQueryWrapper =new LambdaQueryWrapper<>();
+     lambdaQueryWrapper.eq(Setmeal::getId,id);
+     List<SetmealDto> setmealDtoList = new ArrayList<>();
+     List<Setmeal>  setmeals;
+     setmeals=this.list(lambdaQueryWrapper);
+         setmealDtoList = setmeals.stream().map( item ->{
+                    SetmealDto setmealDto =new SetmealDto();
+                    BeanUtils.copyProperties(item,setmealDto);
+                    Category category =categoryService.getById(item.getCategoryId());  //分类名字赋给dto
+                    setmealDto.setCategoryName(category.getName());
+
+                    LambdaQueryWrapper<SetmealDish> setmealDishLambdaQueryWrapper =new LambdaQueryWrapper<>();
+                    setmealDishLambdaQueryWrapper.eq(SetmealDish::getSetmealId,item.getId());
+                    setmealDto.setSetmealDishes(setmealDishService.list(setmealDishLambdaQueryWrapper));
+                    return setmealDto;
+                }
+        ).collect(Collectors.toList());
+
+        return setmealDtoList;
     }
 }

@@ -83,6 +83,15 @@ public class ShoppingCartController {
 
 
 
+    //减少购物车
+    @PostMapping("/sub")
+    public  R<ShoppingCart> sub(@RequestBody ShoppingCart shoppingCart)
+    {
+        return R.success(shoppingCartService.subCart(shoppingCart));
+    }
+
+
+
 
 
 

@@ -27,4 +27,7 @@ public interface DishService extends IService<Dish> {
     //客户端菜品展示
     public List<DishDto>  list(Dish dish);
 
+
+
+
 }

@@ -8,6 +8,7 @@ import com.itheima.reggie.mapper.UserMapper;
 import com.itheima.reggie.service.UserService;
 import com.itheima.reggie.utils.MailUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 

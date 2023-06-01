@@ -15,6 +15,11 @@ public interface ShoppingCartService extends IService<ShoppingCart> {
 
 
 
+    //减少购物车
+    public  ShoppingCart subCart(ShoppingCart  shoppingCart);
+
+
+
     //查看购物车
     public List<ShoppingCart> list();
 

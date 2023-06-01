@@ -1,6 +1,7 @@
 package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.dto.DishDto;
@@ -14,7 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,19 +44,19 @@ public class DishController {
     private RedisTemplate redisTemplate;
 
 
-
     /**
      * 新增菜品
+     *
      * @param dishDto
      * @return
      */
     @PostMapping
-    public R<String> save(@RequestBody DishDto dishDto){
+    public R<String> save(@RequestBody DishDto dishDto) {
         log.info(dishDto.toString());
 
         dishService.saveWithFlavor(dishDto);
 
-        redisTemplate.delete("dish_"+dishDto.getCategoryId()+"_"+dishDto.getStatus());  //新增后 清理某个分类下的缓存数据
+        redisTemplate.delete("dish_" + dishDto.getCategoryId() + "_" + dishDto.getStatus());  //新增后 清理某个分类下的缓存数据
 
         return R.success("新增菜品成功");
     }
@@ -111,47 +114,56 @@ public class DishController {
 
     /**
      * 菜品信息分页查询
+     *
      * @param page
      * @param pageSize
      * @param name
      * @return
      */
     @GetMapping("/page")
-    public R<Page> page(int page,int pageSize,String name) {
-       return R.success(dishService.page(page,pageSize,name));
+    public R<Page> page(int page, int pageSize, String name) {
+        return R.success(dishService.page(page, pageSize, name));
     }
-
 
 
     /**
      * 根据id查询菜品信息和对应的口味信息
+     *
      * @param id
      * @return
      */
     @GetMapping("/{id}")
-    public R<DishDto> get(@PathVariable Long id){
-
+    public R<DishDto> get(@PathVariable Long id) {
         DishDto dishDto = dishService.getByIdWithFlavor(id);
-
         return R.success(dishDto);
     }
 
     /**
      * 修改菜品
+     *
      * @param dishDto
      * @return
      */
-    @PutMapping
-    public R<String> update(@RequestBody DishDto dishDto){
+    @PutMapping()
+    public R<String> update(@RequestBody DishDto dishDto) {
         log.info(dishDto.toString());
-
         dishService.updateWithFlavor(dishDto);
-
-        redisTemplate.delete("dish_"+dishDto.getCategoryId()+"_"+dishDto.getStatus());  //修改后 清理某个分类下的缓存数据
-
+        redisTemplate.delete("dish_" + dishDto.getCategoryId() + "_" + dishDto.getStatus());  //修改后 清理某个分类下的缓存数据
         return R.success("修改菜品成功");
     }
 
+    /**
+     * 客户端修改菜品状态
+     */
+    @PostMapping ("/status/{status}")
+    public R<String> status(@PathVariable("status") Integer status,@RequestParam List<Long> ids) {
+        log.info("status:{}",status);
+        log.info("ids:{}",ids);
+        LambdaUpdateWrapper<Dish> dishLambdaUpdateWrapper =new LambdaUpdateWrapper<>();
+       dishLambdaUpdateWrapper.set(Dish::getStatus,status).in(Dish::getId,ids);
+        dishService.update(dishLambdaUpdateWrapper);
+        return R.success("修改菜品状态成功");
+    }
 
 
     /**
@@ -196,31 +208,55 @@ public class DishController {
             dishDto.setFlavors(dishFlavorService.list(wrapper));   //根据dish_id 查到菜品口味
             return dishDto;
         }).collect(Collectors.toList());
-
-
          //如果不存在  将查询到的数据缓存到redis
         redisTemplate.opsForValue().set(key,dishDtoList,60, TimeUnit.MINUTES);
-
-
         return R.success(dishDtoList);
     }*/
 
 
-    /**客户端菜品展示
-     *
+    /**
+     * 客户端菜品展示
      *
      * @param dish
      * @return
      */
     @GetMapping("/list")
-    public R<List<DishDto>> list(Dish dish){
-
-    return R.success(dishService.list(dish));
-
+    public R<List<DishDto>> list(Dish dish) {
+        return R.success(dishService.list(dish));
     }
 
+
+    /**
+     * 服务端删除和批量删除菜品
+     * @param ids
+     * @return
+     */
+
+    @DeleteMapping
+    @Transactional
+    public R<String> delete(@RequestParam List<Long> ids) {
+
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper =new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.in(Dish::getId,ids);
+        dishService.remove(lambdaQueryWrapper);
+       return R.success("删除成功！！！");
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
 
 
 

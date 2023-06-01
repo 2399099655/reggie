@@ -2,6 +2,7 @@ package com.itheima.reggie.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.CustomException;
@@ -105,4 +106,37 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
         //清空购物车数据
         shoppingCartService.remove(wrapper);
     }
+
+
+
+
+    /**
+     * 客户查询历史订单信息
+     */
+    @Override
+    public Page<Orders> page(int page, int pageSize) {
+        Page<Orders> ordersPage =new Page<>(page,pageSize);
+
+        Long nowUserId = BaseContext.getCurrentId();
+        LambdaQueryWrapper<Orders> lambdaQueryWrapper =new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Orders::getUserId,nowUserId);
+        lambdaQueryWrapper.orderByDesc(Orders::getOrderTime);
+        page(ordersPage,lambdaQueryWrapper);
+        return ordersPage;
+    }
+
+
+    /**
+     * 管理端后台查看订单
+     */
+    @Override
+    public Page<Orders> pageM(int page, int pageSize) {
+        Page<Orders> ordersPage =new Page<>(page,pageSize);
+        LambdaQueryWrapper<Orders> lambdaQueryWrapper =new LambdaQueryWrapper<>()   ;
+        lambdaQueryWrapper.orderByDesc(Orders::getOrderTime);
+        page(ordersPage,lambdaQueryWrapper);
+        return ordersPage;
+    }
+
+
 }

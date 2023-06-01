@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
@@ -47,10 +48,17 @@ public class UserController {
     @PostMapping("/login")
     public R<User> login(@RequestBody Map<String, String> map, HttpSession session) {
         User user = userService.login(map, session);
-
-
         return R.success(user);
     }
+
+@PostMapping("/loginout")
+
+public  R<String> loginout(HttpSession httpSession)
+{
+    httpSession.removeAttribute("user");
+   return R.success("退出成功");
+}
+
 }
 
 

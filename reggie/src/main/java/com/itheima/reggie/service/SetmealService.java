@@ -23,4 +23,8 @@ public interface SetmealService extends IService<Setmeal> {
 
     //管理端套餐分页查询
     public Page<Setmeal> page(int page, int pageSize, String name);
+
+
+    public  List<SetmealDto> showSetmealDish(Long id);
+
 }
