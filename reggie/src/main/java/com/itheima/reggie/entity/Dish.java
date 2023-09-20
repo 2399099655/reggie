@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- 菜品
+ 菜品   i love java...
  */
 @Data
 public class Dish implements Serializable {
